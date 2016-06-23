@@ -81,6 +81,7 @@ def initialize() {
         myDevice = getChildDevice(deviceId)
         log.debug "Value of childDevice at this point Line 82- $childDevice"
         myDevice.name = thisCmd.value
+        log.debug "my Device value = myDevice.name[0]"
         if(myDevice.name[0] in ['s', 'S']) {        			//  SSI or SDL, build map based on Lutron zone #
         	def iloc = myDevice.name.indexOf(',') + 1
 		def ndx = myDevice.name.substring(iloc).toInteger()
