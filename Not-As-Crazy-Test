@@ -56,8 +56,8 @@ def selectLutron() {
 				getCmd(thisCmd, i + 1)
 				getName(thisName, i + 1)
                 		paragraph(" ")
-        }
-        }
+        		}
+        	}
         section("Select Lutron Devices System 2") {
 			for (int S2i = 0; S2i < howManyS2; S2i++) {
 				def thisS2Cmd = "dS2Cmd$S2i"
@@ -67,9 +67,9 @@ def selectLutron() {
                 		paragraph(" ")
 		
 			}
-            }
-		}
+            	}
 	}
+}
 
 def installed() {
 	initialize()
@@ -84,22 +84,22 @@ def initialize() {
 	state.myDevices = [:]
  	state.sysId = [:]					//Defining sysId map
 	if (howmanyS2 > 0) {
-    for (int i = 0 ; i < howManyS2; i++) {
+    	for (int i = 0 ; i < howManyS2; i++) {
         def thisS2Cmd = settings.find {it.key == "dS2Cmd$i"}
         log.debug "line 90 thisS2Cmd is $thisS2Cmd"
         def thisS2Name = settings.find {it.key == "dS2Name$i"}
-        log.debug "line 92"
+        log.debug "line 92, thisS2Name = $thisS2Name"
         def devS2Id = thisS2Name.value				//Assigning thisName.value to devId	
-        log.debug "line 94"
-        if (thisS2Cmd != "") {def thisSystem = S2}
-        def sysNum = "S2"				//Assigning S2 to string sysNum
-        state.sysId << [ devS2Id:sysNum ]				//Populating sysId map
+        log.debug "line 94, devS2Id = $devS2Id"
+        //if (thisS2Cmd != "") {def thisSystem = S2}		//I think this was for the old S2 declaration method
+        def sysNum = "S2"					//Assigning S2 to string sysNum
+        state.sysId << [ devS2Id:sysNum ]			//Populating sysId map
     	def deviceId = "Lutron" + "$i-S2-" + app.id
         def myS2Device = getChildDevice(deviceId)
        	if(!myS2Device) def childDevice = addChildDevice("smartthings", thisS2Cmd.value[1] in ['d', 'D'] ? "Virtual Dimmer" : "On/Off Button Tile", deviceId, null, [label: thisS2Name.value])
         	myS2Device = getChildDevice(deviceId)
         	myS2Device.name = thisS2Cmd.value
-        if(myS2Device.name[0] in ['s', 'S']) {        //  SSI or SDL, build map based on Lutron zone #
+        if(myS2Device.name[0] in ['s', 'S']) {        		//  SSI or SDL, build map based on Lutron zone #
         	def iloc = myS2Device.name.indexOf(',') + 1
 			def ndx = myS2Device.name.substring(iloc).toInteger()
 			state.myDevices << ["$ndx":deviceId]
@@ -142,14 +142,14 @@ def initialize() {
 }
 def switchHandler(evt) {
 	def myDev = evt.device
-    if (state.sysId.myDev == S2 | state.sysId.myDev == s2){
+    if (state.sysId.myDev == S2){
     Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "on" : "off" },S2")	//If so, append 'S2' to the command
     	} else Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "on" : "off" }")	//If not, run the original command
 }
 
 def dimmerHandler(evt) {
 	def myDev = evt.device
-    if (state.sysId.myDev == S2 | state.sysId.myDev == s2){
+    if (state.sysId.myDev == S2){
 	Lutron.sendMsg("$myDev.name,$evt.value,S2")			//If so, append 'S2' to the command
        } else Lutron.sendMsg("$myDev.name,$evt.value")			//If not, run the original command
  }
@@ -157,7 +157,7 @@ def dimmerHandler(evt) {
 def dimOnOffHandler(evt) {
 	def myDev = evt.device
     def level = myDev.currentLevel ?: 100
-    if (state.sysId.myDev == S2 | state.sysId.myDev == s2){
+    if (state.sysId.myDev == S2){
 	Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "$level" : "0" },S2")		//If so, append 'S2' to the command
 	} else Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "$level" : "0" }")	//If not, run the original command
  }
