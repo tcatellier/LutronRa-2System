@@ -83,17 +83,18 @@ def updated() {
 def initialize() {
 	state.myDevices = [:]
  	state.sysId = [:]					//Defining sysId map
-	if (howmanyS2 > 0) {
+	if (howManyS2 > 0) {
+    	log.debug "We're in the S2 if statement and howManyS2 = $howManyS2"
     	for (int i = 0 ; i < howManyS2; i++) {
         def thisS2Cmd = settings.find {it.key == "dS2Cmd$i"}
         log.debug "line 90 thisS2Cmd is $thisS2Cmd"
         def thisS2Name = settings.find {it.key == "dS2Name$i"}
         log.debug "line 92, thisS2Name = $thisS2Name"
-        def devS2Id = thisS2Name.value				//Assigning thisName.value to devId	
+        def devS2Id = thisS2Name.value						//Assigning thisName.value to devId	
         log.debug "line 94, devS2Id = $devS2Id"
         //if (thisS2Cmd != "") {def thisSystem = S2}		//I think this was for the old S2 declaration method
-        def sysNum = "S2"					//Assigning S2 to string sysNum
-        state.sysId << [ devS2Id:sysNum ]			//Populating sysId map
+        def sysNum = "S2"									//Assigning S2 to string sysNum
+        state.sysId << [ devS2Id:sysNum ]					//Populating sysId map
     	def deviceId = "Lutron" + "$i-S2-" + app.id
         def myS2Device = getChildDevice(deviceId)
        	if(!myS2Device) def childDevice = addChildDevice("smartthings", thisS2Cmd.value[1] in ['d', 'D'] ? "Virtual Dimmer" : "On/Off Button Tile", deviceId, null, [label: thisS2Name.value])
@@ -116,8 +117,8 @@ def initialize() {
     else for (int i = 0 ; i < howMany; i++) {
         def thisCmd = settings.find {it.key == "dCmd$i"}
         def thisName = settings.find {it.key == "dName$i"}
-        def devId = thisName.value				//Assigning thisName.value to devId	
-        def sysNum = "S1"         				//Assigning S1 to string sysNum
+        def devId = thisName.value					//Assigning thisName.value to devId	
+        def sysNum = "S1"         					//Assigning S1 to string sysNum
         state.sysId << [ devId:sysNum ]				//Populating sysId map
     	def deviceId = "Lutron" + "$i-" + app.id
         def myDevice = getChildDevice(deviceId)
@@ -161,7 +162,6 @@ def dimOnOffHandler(evt) {
 	Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "$level" : "0" },S2")		//If so, append 'S2' to the command
 	} else Lutron.sendMsg("$myDev.name,${evt.value == "on" ? "$level" : "0" }")	//If not, run the original command
  }
-log.debug "made it to line 165"
 def LutronHandler(evt) {
 	if (evt.value.startsWith("LZC") && !evt.value.endsWith("CHG")) {  // process on/off of zone
 		def ndx = evt.value.substring(evt.value[4] == "0" ? 5 : 4, 6)
